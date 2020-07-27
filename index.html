@@ -1,126 +1,183 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style> /* set the CSS */
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
 
-body { font: 12px Arial;}
+<style>
+  body {
+    background-color: whitesmoke;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+  }
 
-path { 
-    stroke: steelblue;
-    stroke-width: 2;
+  :root {
+    --line-chart-color: #66615e;
+  }
+
+  svg {
+    background-color: whitesmoke;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .axis,
+  .axis text {
+    fill: var(--line-chart-color);
+  }
+
+  .axis line,
+  path {
+    stroke: var(--line-chart-color);
+    stroke-width: 1.5;
+  }
+
+  path {
     fill: none;
-}
+  }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
-}
+  text.title {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
 
+  #mybutton {
+    position: relative;
+  }
+
+  a.button1 {
+    display: inline-block;
+    padding: 0.35em 1.2em;
+    border: 0.1em solid #000000;
+    margin: 0 0.3em 0.3em 0;
+    border-radius: 0.12em;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    color: #000000;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  a.button1:hover {
+    color: #000000;
+    background-color: #fe2c54;
+  }
+
+  @media all and (max-width:30em) {
+    a.button1 {
+      display: block;
+      margin: 0.4em auto;
+    }
+  }
 </style>
+
 <body>
+  <h1>Chart 1</h1>
 
-<!-- Add 2 buttons -->
-<button onclick="update(true)">Exclude 2020</button>
-<button onclick="update(false)">Include 2020</button>
+  <a href='#' onclick="update(true)" class="button1">Exclude 2020</a>
+  <a href='#' onclick="update(false)" class="button1" style="box-shadow:0 0 20px #fe2c54;">Include 2020</a>
 
-<!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
+  <div id="chart"></div>
+  <p>Some text</p>
+  <div id="mybutton">
+    <a onclick="location.href='/annotations.html';" class="button1">Next</a>
+  </div>
 
-<!-- load the d3.js library -->    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
 
-<script>
+  <script>
+    // parms to use
+    var parseTime = d3.timeParse("%Y-%m-%d");
+    var endDate = parseTime("2019-01-01");
 
-// Create 2 datasets
+    //  init chart stuff
+    var margin = { top: 20, right: 20, bottom: 50, left: 70 },
+      width = 1000 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
-// data is now whole data set
-// draw chart in here!
-var parseTime = d3.timeParse("%Y-%m-%d");
-var endDate = parseTime("2019-01-01");
 
-// set the dimensions and margins of the graph
-var margin = {top: 20, right: 20, bottom: 50, left: 70},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    var svg = d3.select("#chart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
 
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+    // x-axis
+    var x = d3.scaleTime().range([0, width]);
+    var xAxis = d3.axisBottom().scale(x);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .attr("class", "myXaxis")
 
-// Initialise a X axis:
-var x = d3.scaleTime().range([0, width]);
-var xAxis = d3.axisBottom().scale(x);
-svg.append("g")
-  .attr("transform", "translate(0," + height + ")")
-  .attr("class","myXaxis")
+    // y-axis
+    var y = d3.scaleLinear().range([height, 0]);
+    var yAxis = d3.axisLeft().scale(y);
+    svg.append("g")
+      .attr("class", "myYaxis")
 
-// Initialize an Y axis
-var y = d3.scaleLinear().range([height, 0]);
-var yAxis = d3.axisLeft().scale(y);
-svg.append("g")
-  .attr("class","myYaxis")
+    svg.append("text")
+      .attr("class", "y label")
+      .attr("text-anchor", "end")
+      .attr("y", 6)
+      .attr("dy", ".75em")
+      .attr("fill", "#fe2c54")
+      .attr("transform", "rotate(-90)")
+      .text("Initial UI Claims");
 
-// Create a function that takes a dataset as input and update the plot:
-function update(filter) {
-  d3.csv("https://raw.githubusercontent.com/bdeignan/ui-claims-data/master/data/ui-claims.csv").then(function(data) {
 
-    data.forEach(function(d) {
-      d.date = parseTime(d.week);
-      d.initial_claims = +d.initial_claims;
-    });
+    // Function that takes a bool input to update chart:
+    function update(filter) {
+      d3.csv("https://raw.githubusercontent.com/bdeignan/ui-claims-data/master/data/ui-claims.csv").then(function (data) {
 
-    if(filter){
-      var data = data.filter(function(d) { 
-        if( d.date <= endDate){ return d;} 
+        data.forEach(function (d) {
+          d.date = parseTime(d.week);
+          d.initial_claims = +d.initial_claims;
         });
+        // if filter argumenet true, filter data after endDate
+        if (filter) {
+          var data = data.filter(function (d) {
+            if (d.date <= endDate) { return d; }
+          });
+        }
+
+        // Create the X axis:
+        x.domain([0, d3.max(data, function (d) { return d.date })]);
+        svg.selectAll(".myXaxis")
+          .transition()
+          .duration(3000)
+          .call(xAxis);
+
+        // create the Y axis
+        y.domain([0, d3.max(data, function (d) { return d.initial_claims })]);
+        svg.selectAll(".myYaxis")
+          .transition()
+          .duration(3000)
+          .call(yAxis);
+
+
+        // Create an update selection: bind to the new data
+        var updateSVG = svg.selectAll(".lineUpdate")
+          .data([data], function (d) { return d.date });
+
+        updateSVG.enter()
+          .append("path")
+          .attr("class", "lineUpdate")
+          .merge(updateSVG)
+          .transition()
+          .duration(3000)
+          .attr("d", d3.line()
+            .x(function (d) { return x(d.date); })
+            .y(function (d) { return y(d.initial_claims); }));
+
+
+      })
+        .catch(function (error) { 
+        })
     }
 
-  // Create the X axis:
-  x.domain([0, d3.max(data, function(d) { return d.date }) ]);
-  svg.selectAll(".myXaxis").transition()
-    .duration(3000)
-    .call(xAxis);
+    // Start with filter on.
+    update(true)
 
-  // create the Y axis
-  y.domain([0, d3.max(data, function(d) { return d.initial_claims  }) ]);
-  svg.selectAll(".myYaxis")
-    .transition()
-    .duration(3000)
-    .call(yAxis);
-
-  // Create a update selection: bind to the new data
-  var u = svg.selectAll(".lineTest")
-    .data([data], function(d){ return d.date });
-
-  // Updata the line
-  u
-    .enter()
-    .append("path")
-    .attr("class","lineTest")
-    .merge(u)
-    .transition()
-    .duration(3000)
-    .attr("d", d3.line()
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d.initial_claims); }))
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 2.5)
-      })
-  .catch(function(error){
-     // handle error   
-  })
-}
-
-// At the beginning, I run the update function on the first dataset:
-update(true)
-
-</script>
+  </script>
 </body>
