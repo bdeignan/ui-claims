@@ -71,11 +71,11 @@
 
 <body>
     <h1>Chart 3</h1>
-    <svg width="800" height="500"></svg>
+    <svg width="1000" height="600"></svg>
     <p>Some text</p>
     <div id="mybutton">
 
-        <a onclick="location.href='/annotations.html';" class="button1">Previous</a>
+        <a onclick="location.href='./annotations.html';" class="button1">Previous</a>
     </div>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -85,7 +85,7 @@
         //  init chart stuff
         var svg = d3.select("svg"),
             margin = { top: 0, right: 20, bottom: 110, left: 70 },
-            margin2 = { top: 415, right: 20, bottom: 30, left: 70 },
+            margin2 = { top: 515, right: 20, bottom: 30, left: 70 },
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
             height2 = +svg.attr("height") - margin2.top - margin2.bottom;
