@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
 
 <style>
   body {
@@ -74,13 +74,22 @@
 <!-- <base href="http://localhost:9999/">  -->
 <!-- <base href="https://bdeignan.github.io/ui-claims/">  -->
 <body>
-  <h1>Chart 1</h1>
+  <h1>Weekly Unemployment Insurance (UI) Claims in the U.S.</h1>
 
   <a href='#' onclick="update(true)" class="button1">Exclude 2020</a>
   <a href='#' onclick="update(false)" class="button1" style="box-shadow:0 0 20px #fe2c54;">Include 2020</a>
-
+  <br></br>
   <div id="chart"></div>
-  <p>Some text</p>
+  <p style="width: 1020px;">
+    Unemployment insurance (UI) helps many people who have lost their jobs by temporarily 
+    replacing part of their wages while they look for work.
+    An initial claim for UI is a claim filed by an unemployed individual 
+    after a separation from an employer. 
+    Initial claims data measure emerging trends in national unemployment.
+    The spread of coronavirus in the U.S. in 2020 has led to the worst UI claims data on record. This data 
+    can be obtained from the <a href="https://oui.doleta.gov/unemploy/claims.asp">Department of 
+      Labor's website</a>.
+  </p>
   <div id="mybutton">
     <a onclick="location.href='./annotations.html';" class="button1">Next</a>
   </div>
